@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xena's World</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      background: linear-gradient(135deg, #ffe6f7, #e7e2ff, #dff8ff);
+      color: #35263d;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 650px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: clamp(2.2rem, 8vw, 4rem);
+      font-weight: 900;
+      margin: 10px 0 4px;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+    }
+
+    .cat-card {
+      background: white;
+      border-radius: 30px;
+      padding: 15px;
+      box-shadow: 0 10px 30px rgba(60, 30, 70, 0.15);
+      user-select: none;
+      touch-action: pan-y;
+    }
+
+    .cat-image-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      background: #f5eef8;
+    }
+
+    .cat-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cat-info {
+      padding: 15px 8px 5px;
+    }
+
+    .cat-name {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .cat-personality {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #604b68;
+    }
+
+    .message {
+      min-height: 45px;
+      margin: 15px 0 5px;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      min-height: 48px;
+      transition: transform 0.15s ease;
+    }
+
+    button:hover {
+      transform: scale(1.04);
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    .normal {
+      background: #ffd1ed;
+    }
+
+    .silly {
+      background: #d8c8ff;
+    }
+
+    .surprised {
+      background: #bdefff;
+    }
+
+    .navigation {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .navigation button {
+      flex: 1;
+      background: white;
+      border: 2px solid #ead9ed;
+    }
+
+    .counter {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: #765f7d;
+    }
+
+    .swipe-hint {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #806d85;
+    }
+
+    .paw {
+      position: absolute;
+      font-size: 4rem;
+      animation: paw-pop 0.7s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes paw-pop {
+      0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(20px);
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1.2) translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1) translateY(-60px);
+      }
+    }
+
+    .cat-card.pop {
+      animation: card-pop 0.3s ease;
+    }
+
+    @keyframes card-pop {
+      0% {
+        transform: scale(0.96);
+      }
+
+      70% {
+        transform: scale(1.02);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 12px;
+      }
+
+      .cat-name {
+        font-size: 1.6rem;
+      }
+
+      button {
+        padding: 12px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <div class="title">🐾 Xena's World 🐾</div>
+
+    <div class="subtitle">
+      Welcome to the kitty kingdom!
+    </div>
+
+    <div class="cat-card" id="catCard">
+
+      <div class="cat-image-container" id="catArea">
+
+        <img
+          id="catImage"
+          class="cat-image"
+          src=""
+          alt="Xena's cat"
+        >
+
+      </div>
+
+      <div class="cat-info">
+
+        <div class="cat-name" id="catName"></div>
+
+        <div class="cat-personality" id="catPersonality"></div>
+
+      </div>
+
+    </div>
+
+    <div class="message" id="message">
+      Tap the kitty!
+    </div>
+
+    <div class="buttons">
+
+      <button class="normal" id="normalButton">
+        🐱 Meow!
+      </button>
+
+      <button class="silly" id="sillyButton">
+        🤪 Silly!
+      </button>
+
+      <button class="surprised" id="surprisedButton">
+        😲 Surprise!
+      </button>
+
+    </div>
+
+    <div class="navigation">
+
+      <button id="previousButton">
+        ← Previous
+      </button>
+
+      <button id="nextButton">
+        Next →
+      </button>
+
+    </div>
+
+    <div class="counter" id="counter"></div>
+
+    <div class="swipe-hint">
+      👆 Swipe left or right to meet another kitty!
+    </div>
+
+  </main>
+
+
+  <script>
+
+    /*
+      ==========================================
+      XENA'S WORLD
+      CAT INFORMATION
+      ==========================================
+    */
+
+    const cats = [
+
+      {
+        name: "BowBow Cat",
+
+        image: "images/cats/bowbow.jpg",
+
+        normal: "sounds/cats/bowbow-normal.m4a",
+        silly: "sounds/cats/bowbow-silly.m4a",
+        surprised: "sounds/cats/bowbow-surprised.m4a",
+
+        personality:
+          "The sweet little sweetheart who loves attention, cuddles, and being told how adorable she is."
+      },
+
+      {
+        name: "Derpy Cat",
+
+        image: "images/cats/derpy.jpg",
+
+        normal: "sounds/cats/derpy-normal.m4a",
+        silly: "sounds/cats/derpy-silly.m4a",
+        surprised: "sounds/cats/derpy-surprised.m4a",
+
+        personality:
+          "A lovable goofball who is always confused and somehow manages to get into ridiculous situations."
+      },
+
+      {
+        name: "Mimi Cat",
+
+        image: "images/cats/mimi.jpg",
+
+        normal: "sounds/cats/mimi-normal.m4a",
+        silly: "sounds/cats/mimi-silly.m4a",
+        surprised: "sounds/cats/mimi-surprised.m4a",
+
+        personality:
+          "A gentle, affectionate cat who thinks everyone is her best friend and always wants to be close."
+      },
+
+      {
+        name: "Pickles Cat",
+
+        image: "images/cats/pickles.jpg",
+
+        normal: "sounds/cats/pickles-normal.m4a",
+        silly: "sounds/cats/pickles-silly.m4a",
+        surprised: "sounds/cats/pickles-surprised.m4a",
+
+        personality:
+          "A mischievous little troublemaker who definitely did the thing... but will absolutely deny it."
+      },
+
+      {
+        name: "Princess Buttercup Cat",
+
+        image: "images/cats/princess-buttercup.jpg",
+
+        normal: "sounds/cats/princess-buttercup-normal.m4a",
+        silly: "sounds/cats/princess-buttercup-silly.m4a",
+        surprised: "sounds/cats/princess-buttercup-surprised.m4a",
+
+        personality:
+          "A fancy princess who expects royal treatment, delicious snacks, and compliments at all times."
+      },
+
+      {
+        name: "Scaredy Cat",
+
+        image: "images/cats/scaredy.jpg",
+
+        normal: "sounds/cats/scaredy-normal.m4a",
+        silly: "sounds/cats/scaredy-silly.m4a",
+        surprised: "sounds/cats/scaredy-surprised.m4a",
+
+        personality:
+          "A nervous little kitty who gets startled by practically everything—but is very brave when it counts."
+      },
+
+      {
+        name: "Shocky Cat",
+
+        image: "images/cats/shocky.jpg",
+
+        normal: "sounds/cats/shocky-normal.m4a",
+        silly: "sounds/cats/shocky-silly.m4a",
+        surprised: "sounds/cats/shocky-surprised.m4a",
+
+        personality:
+          "A wildly energetic cat who is constantly surprised, excited, and ready to go ZOOM!"
+      },
+
+      {
+        name: "Singy Cat",
+
+        image: "images/cats/singy.jpg",
+
+        normal: "sounds/cats/singy-normal.m4a",
+        silly: "sounds/cats/singy-silly.m4a",
+        surprised: "sounds/cats/singy-surprised.m4a",
+
+        personality:
+          "A musical kitty who believes every meow is a song and every moment is a chance to perform."
+      },
+
+      {
+        name: "Three Ladies Cat",
+
+        image: "images/cats/three-ladies.jpg",
+
+        normal: "sounds/cats/three-ladies-normal.m4a",
+        silly: "sounds/cats/three-ladies-silly.m4a",
+        surprised: "sounds/cats/three-ladies-surprised.m4a",
+
+        personality:
+          "Three fabulous ladies who always stick together, have lots to say, and somehow always know what's going on."
+      },
+
+      {
+        name: "Three Musketeers Cat",
+
+        image: "images/cats/three-musketeers.jpg",
+
+        normal: "sounds/cats/three-musketeers-normal.m4a",
+        silly: "sounds/cats/three-musketeers-silly.m4a",
+        surprised: "sounds/cats/three-musketeers-surprised.m4a",
+
+        personality:
+          "Three adventurous best friends who are always ready for a mission, a mystery, or a little bit of kitty chaos."
+      }
+
+    ];
+
+
+    /*
+      ==========================================
+      APP
+      ==========================================
+    */
+
+    let currentCat = 0;
+
+    const catImage =
+      document.getElementById("catImage");
+
+    const catName =
+      document.getElementById("catName");
+
+    const catPersonality =
+      document.getElementById("catPersonality");
+
+    const message =
+      document.getElementById("message");
+
+    const counter =
+      document.getElementById("counter");
+
+    const catCard =
+      document.getElementById("catCard");
+
+    const catArea =
+      document.getElementById("catArea");
+
+
+    /*
+      ==========================================
+      SHOW CAT
+      ==========================================
+    */
+
+    function showCat(index) {
+
+      currentCat =
+        (index + cats.length) % cats.length;
+
+      const cat =
+        cats[currentCat];
+
+      catImage.src =
+        cat.image;
+
+      catImage.alt =
+        cat.name;
+
+      catName.textContent =
+        cat.name;
+
+      catPersonality.textContent =
+        cat.personality;
+
+      counter.textContent =
+        `Kitty ${currentCat + 1} of ${cats.length}`;
+
+      message.textContent =
+        `Say hello to ${cat.name}!`;
+
+      catCard.classList.remove("pop");
+
+      void catCard.offsetWidth;
+
+      catCard.classList.add("pop");
+    }
+
+
+    /*
+      ==========================================
+      PLAY SOUND
+      ==========================================
+    */
+
+    function playSound(type) {
+
+      const cat =
+        cats[currentCat];
+
+      const soundFile =
+        cat[type];
+
+      const audio =
+        new Audio(soundFile);
+
+      audio.play()
+        .catch(error => {
+
+          console.log(
+            "Audio could not play:",
+            error
+          );
+
+        });
+
+
+      if (type === "normal") {
+
+        message.textContent =
+          `${cat.name} says MEOW! 🐱`;
+
+      }
+
+      if (type === "silly") {
+
+        message.textContent =
+          `${cat.name} is being silly! 🤪`;
+
+      }
+
+      if (type === "surprised") {
+
+        message.textContent =
+          `${cat.name} got SURPRISED! 😲`;
+
+      }
+
+      createPaw();
+
+    }
+
+
+    /*
+      ==========================================
+      PAW ANIMATION
+      ==========================================
+    */
+
+    function createPaw() {
+
+      const paw =
+        document.createElement("div");
+
+      paw.className =
+        "paw";
+
+      paw.textContent =
+        "🐾";
+
+      paw.style.left =
+        `${30 + Math.random() * 40}%`;
+
+      paw.style.top =
+        `${30 + Math.random() * 30}%`;
+
+      catArea.appendChild(paw);
+
+      setTimeout(() => {
+
+        paw.remove();
+
+      }, 700);
+
+    }
+
+
+    /*
+      ==========================================
+      BUTTONS
+      ==========================================
+    */
+
+    document
+      .getElementById("normalButton")
+      .addEventListener(
+        "click",
+        () => playSound("normal")
+      );
+
+
+    document
+      .getElementById("sillyButton")
+      .addEventListener(
+        "click",
+        () => playSound("silly")
+      );
+
+
+    document
+      .getElementById("surprisedButton")
+      .addEventListener(
+        "click",
+        () => playSound("surprised")
+      );
+
+
+    document
+      .getElementById("previousButton")
+      .addEventListener(
+        "click",
+        () => showCat(currentCat - 1)
+      );
+
+
+    document
+      .getElementById("nextButton")
+      .addEventListener(
+        "click",
+        () => showCat(currentCat + 1)
+      );
+
+
+    /*
+      ==========================================
+      SWIPING
+      ==========================================
+    */
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    catCard.addEventListener(
+      "touchstart",
+      event => {
+
+        touchStartX =
+          event.changedTouches[0].screenX;
+
+      }
+    );
+
+
+    catCard.addEventListener(
+      "touchend",
+      event => {
+
+        touchEndX =
+          event.changedTouches[0].screenX;
+
+        handleSwipe();
+
+      }
+    );
+
+
+    function handleSwipe() {
+
+      const distance =
+        touchEndX - touchStartX;
+
+      if (Math.abs(distance) < 50) {
+        return;
+      }
+
+      if (distance < 0) {
+
+        showCat(currentCat + 1);
+
+      } else {
+
+        showCat(currentCat - 1);
+
+      }
+
+    }
+
+
+    /*
+      ==========================================
+      START
+      ==========================================
+    */
+
+    showCat(0);
+
+  </script>
+
+</body>
+</html>
